@@ -14,6 +14,7 @@ public class CollisionHandler : MonoBehaviour
     private void Awake()
     {
         rocketAudio = GetComponent<AudioSource>();
+        isDone = false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -23,14 +24,11 @@ public class CollisionHandler : MonoBehaviour
             switch (collision.gameObject.tag)
             {
                 case "LaunchPad":
-                    Debug.Log("Back where you started!");
                     break;
                 case "LandingPad":
-                    Debug.Log("Made it!");
                     StartSuccessSequence();
                     break;
                 default:
-                    Debug.Log("BOOM!");
                     StartCrashSequence();
                     break;
             }
@@ -49,8 +47,8 @@ public class CollisionHandler : MonoBehaviour
 
     private void StartSuccessSequence()
     {
-        GetComponent<Movement>().enabled = false;
         isDone = true;
+        GetComponent<Movement>().enabled = false;
         rocketAudio.PlayOneShot(successClip);
         Invoke("LoadNextScene", sceneDelay);
     }
@@ -69,6 +67,7 @@ public class CollisionHandler : MonoBehaviour
         {
             nextScene = 0;
         }
+        isDone = false;
         SceneManager.LoadScene(nextScene);
     }
 }

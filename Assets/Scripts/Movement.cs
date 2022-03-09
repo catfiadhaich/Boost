@@ -19,11 +19,6 @@ public class Movement : MonoBehaviour
         rocketAudio = GetComponent<AudioSource>();
     }
 
-    void Start()
-    {
-        
-    }
-
     void Update()
     {
         ProcessThrustPower();
@@ -47,16 +42,22 @@ public class Movement : MonoBehaviour
         } else if (Input.GetKey(KeyCode.E)) {
             lateral = lateralThrust * Time.deltaTime;
         }
-        if (Input.GetKey(KeyCode.Return)) {
-            float forwardThrust = thrust * Time.deltaTime;
-            rocketBody.AddRelativeForce(lateral, forwardThrust, 0);
-            PlayThrustSound(true);
+        if (Input.GetKey(KeyCode.Return))
+        {
+            MainThrust(lateral);
         }
         else
         {
             PlayThrustSound(false);
         }
         
+    }
+
+    private void MainThrust(float lateral)
+    {
+        float forwardThrust = thrust * Time.deltaTime;
+        rocketBody.AddRelativeForce(lateral, forwardThrust, 0);
+        PlayThrustSound(true);
     }
 
     private void PlayThrustSound(bool play)
