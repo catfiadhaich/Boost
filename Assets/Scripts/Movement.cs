@@ -9,11 +9,14 @@ public class Movement : MonoBehaviour
     [SerializeField] private float maxThrust = 2000.0f;
     [SerializeField] private float rotationRate = 50f;
     [SerializeField] private float lateralThrust = 200f;
+    [SerializeField] private AudioClip thrustClip;
  
     private Rigidbody rocketBody;
+    private AudioSource rocketAudio;
 
     private void Awake() {
         rocketBody = GetComponent<Rigidbody>();
+        rocketAudio = GetComponent<AudioSource>();
     }
 
     void Start()
@@ -30,9 +33,9 @@ public class Movement : MonoBehaviour
 
     private void ProcessThrustPower() {
         if (Input.GetKey(KeyCode.W)) {
-            thrust += 10;
+            thrust += 50;
         } else if (Input.GetKey(KeyCode.S)) {
-            thrust -= 10;
+            thrust -= 50;
         }
         thrust = Mathf.Clamp(thrust, minThrust, maxThrust);
     }
@@ -40,15 +43,33 @@ public class Movement : MonoBehaviour
         
         float lateral = 0f;
         if (Input.GetKey(KeyCode.Q)) {
-            lateral = lateralThrust * Time.deltaTime;
-        } else if (Input.GetKey(KeyCode.E)) {
             lateral = -lateralThrust * Time.deltaTime;
+        } else if (Input.GetKey(KeyCode.E)) {
+            lateral = lateralThrust * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.Return)) {
             float forwardThrust = thrust * Time.deltaTime;
             rocketBody.AddRelativeForce(lateral, forwardThrust, 0);
-        } 
+            PlayThrustSound(true);
+        }
+        else
+        {
+            PlayThrustSound(false);
+        }
         
+    }
+
+    private void PlayThrustSound(bool play)
+    {
+        if (play && !rocketAudio.isPlaying && thrustClip != null)
+        {
+            rocketAudio.PlayOneShot(thrustClip);
+        }
+        else if (!play && rocketAudio.isPlaying)
+        {
+            rocketAudio.Stop();
+        }
+
     }
 
     private void ProcessRotation() {
@@ -61,7 +82,9 @@ public class Movement : MonoBehaviour
     }
 
     private void ApplyRotation(int rot) {
+        rocketBody.freezeRotation = true;
         float effectiveRotation = rotationRate * Time.deltaTime * rot;
         transform.Rotate(0, 0, effectiveRotation);
+        rocketBody.freezeRotation = false;
     }
 }
